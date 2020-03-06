@@ -1,16 +1,28 @@
-FROM ruby:2.6.3
+FROM ruby:2.6.5
+RUN apt-get update && apt-get install -y nodejs build-essential
 
-RUN bundle config --global frozen 1
-RUN mkdir /PhotoSite
-WORKDIR /PhotoSite
-COPY Gemfile /PhotoSite/Gemfile
-COPY Gemfile.lock /PhotoSite/Gemfile.lock
-RUN gem install bundler:2.1.4
+
+# Configure the main working directory. This is the base
+# directory used in any further RUN, COPY, and ENTRYPOINT
+# commands.
+RUN mkdir -p /app
+WORKDIR /app
+
+# Copy the Gemfile as well as the Gemfile.lock and install
+# the RubyGems. This is a separate step so the dependencies
+# will be cached unless changes to one of those two files
+# are made.
+COPY Gemfile Gemfile.lock ./
 RUN bundle install
-COPY . /PhotoSite
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg -o /root/yarn-pubkey.gpg && apt-key add /root/yarn-pubkey.gpg
-RUN apt-get update && apt-get install -y --no-install-recommends nodejs yarn
 
-RUN apt-get -y install sqlite3 libsqlite3-dev
+# Copy the main application.
+COPY . ./
+
+# Expose port 3000 to the Docker host, so we can access it
+# from the outside.
 EXPOSE 3000
-CMD bundle exec rails s -p ${PORT} -b '0.0.0.0'
+
+# The main command to run when the container starts. Also
+# tell the Rails dev server to bind to all interfaces by
+# default.
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
