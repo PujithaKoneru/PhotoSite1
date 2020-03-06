@@ -1,9 +1,17 @@
 # README
 
+Pujitha Koneru
+
+Net Id -  hh5829
+
+Project R1 - Photosite
+
+Status - Successful
+
 This README would normally document whatever steps are necessary to get the
 application up and running.
 
-Things you may want to cover:
+Things covered:
 
 * Ruby version
 
